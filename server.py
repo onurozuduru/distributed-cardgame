@@ -235,6 +235,16 @@ def make_move(game_num, player_name, move):
     return flask.jsonify(res)
 
 
+@app.route('/game/<int:game_num>/moves')
+def get_moves(game_num):
+    if game_num >= len(games):
+        abort(404)
+    game = games[game_num]
+    p1 = game.players[0]
+    p2 = game.players[1]
+    return flask.jsonify({p1.name: p1.moves, p2.name: p2.moves})
+
+
 @app.route('/game/<int:game_num>/newround')
 def new_round(game_num):
     if game_num >= len(games):
