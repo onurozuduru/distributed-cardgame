@@ -1,4 +1,4 @@
-var host = "http://localhost:5000";
+var host = "https://192.168.56.106";
 
 var game = {
     number: -1,
