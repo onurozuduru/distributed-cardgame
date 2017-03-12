@@ -1,11 +1,26 @@
 <!DOCTYPE html>
-<html>
-  <head>
-      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-    <title>Testing</title>
-  </head>
-  <body>
-    <script src="js/client.js"></script>
-    <h1>Hello, Worlds...</h1>
-  </body>
+<html lang="en-US">
+    <head>
+        <title>Card Game</title>
+        <link rel="stylesheet" href="css/client.css">
+        <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.2.min.js"></script>
+        <script type = "text/javascript" src = "https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js"></script>
+    </head>
+    <body>
+        <dev id="header">
+            <div id=infoPanel></div>
+            <button id=newGame>New Game</button>
+        </dev>
+        <dev id="gameField">
+            <button id=player1PlayedCard></button>
+            <button id=player2PlayedCard></button>
+        </dev>
+        <dev id="cardPanels">
+            <button id=card1></button>
+            <button id=card2></button>
+            <button id=card3></button>
+        </dev>
+        <dev id="gameResult"></dev>
+        <script type="text/javascript" src="js/client.js"></script>
+    </body>
 </html>
