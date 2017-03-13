@@ -11,7 +11,7 @@ var game = {
     thisPlayer: "",
     currentStatus: "" //waitingForJoininingTheOtherPlayer, play
 }
-
+var theOtherPlayerLastMove;
 var updateGameStatusInterval;
 
 $("#player1PlayedCard").hide();
@@ -137,6 +137,17 @@ function showWinner(){
 }
 
 function updateGameStatus(){
+    $.getJSON(host+'/game/'+game.number+'/moves').done(function (data) {
+        if ((game.thisPlayer == 'p1') && (data.p2.length > 0)){
+            theOtherPlayerLastMove = data.p2.pop(); //last move
+             $("#player2PlayedCard").text(theOtherPlayerLastMove);
+        }
+        else if(data.p1.length > 0) {
+            theOtherPlayerLastMove = data.p1.pop(); //last move
+            $("#player2PlayedCard").text(theOtherPlayerLastMove);
+        }
+    }).error(function (error) {alert("error"); });
+
     $.getJSON(host+'/game/'+game.number).done(function (data) {
         if (data.current_player != null){
             game.currentPlayer = data.current_player.name;
