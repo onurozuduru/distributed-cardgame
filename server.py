@@ -3,6 +3,7 @@ import random
 import flask
 from flask import Flask
 from flask import abort
+from time import gmtime, strftime
 
 
 #### Player ####
@@ -178,6 +179,11 @@ def get_player_by_name(game, p_name):
             return player
     return None
 
+def log(message, output=None):
+    if output:
+        print strftime("%Y-%m-%d %H:%M:%S", gmtime()) + "LOG msg: " + message + "=>" + str(output)
+    else:
+        print strftime("%Y-%m-%d %H:%M:%S", gmtime()) + "LOG msg: " + message
 
 @app.route('/newgame')
 def new_game():
@@ -188,6 +194,7 @@ def new_game():
         res['game_num'] = missing[0]
         res['player'] = missing[1].get_object()
         if not games[missing[0]].begin():
+            log("GAME COULD NOT BEGIN!")
             abort(404)
     else:
         game = Game()
@@ -197,19 +204,23 @@ def new_game():
         player.make_online()
         res['game_num'] = game_num
         res['player'] = player.get_object()
+    log("New Game is started. Game Num: "+str(res['game_num']), res)
     return flask.jsonify(res)
 
 
 @app.route('/game/<int:game_num>')
 def game_status(game_num):
     if game_num >= len(games):
+        log("Game could not be found. Game num",game_num)
         abort(404)
+    log("Game Num: "+str(game_num)+" Status", games[game_num].get_object())
     return flask.jsonify(games[game_num].get_object())
 
 
 @app.route('/move/<int:game_num>/<player_name>/<move>')
 def make_move(game_num, player_name, move):
     if game_num >= len(games):
+        log("Game could not be found. Game num",game_num)
         abort(404)
     game = games[game_num]
     res = {}
@@ -228,16 +239,19 @@ def make_move(game_num, player_name, move):
             else:
                 p = game.next_player()
                 if not p:
+                    log("Game Move could not found next player. Game Num", game_num)
                     abort(404)
                 res['stage'] = game.stage
                 res['player'] = p.get_object()
             res['last_move'] = m
+    log("Game Num: "+str(game_num)+" Player moved. Details", res)
     return flask.jsonify(res)
 
 
 @app.route('/game/<int:game_num>/moves')
 def get_moves(game_num):
     if game_num >= len(games):
+        log("Game could not be found. Game num",game_num)
         abort(404)
     game = games[game_num]
     p1 = game.players[0]
@@ -248,27 +262,33 @@ def get_moves(game_num):
 @app.route('/game/<int:game_num>/newround')
 def new_round(game_num):
     if game_num >= len(games):
+        log("Game could not be found. Game num",game_num)
         abort(404)
     game = games[game_num]
     res = game.new_round()
     if not res:
+        log("Game Num: "+str(game_num)+" New round could not begin!")
         abort(404)
     stage, player = res[0], res[1]
+    log("Game Num: "+str(game_num)+" New round begin", {'stage': stage, 'player': player.get_object()})
     return flask.jsonify({'stage': stage, 'player': player.get_object()})
 
 
 @app.route('/game/<int:game_num>/endofround')
 def end_round(game_num):
     if game_num >= len(games):
+        log("Game could not be found. Game num",game_num)
         abort(404)
     game = games[game_num]
     game.end_of_round()
+    log("Game Num: "+str(game_num)+" End of round.")
     return flask.jsonify(game.get_object())
 
 
 @app.route('/game/<int:game_num>/winner')
 def who_won(game_num):
     if game_num >= len(games):
+        log("Game could not be found. Game num",game_num)
         abort(404)
     game = games[game_num]
     winner = game.winner()
@@ -279,6 +299,7 @@ def who_won(game_num):
     else:
         res['is_winner'] = 1
         res['winner'] = winner.get_object()
+    log("Game Num: "+str(game_num)+" Winner result details",res)
     return flask.jsonify(res)
 
 
