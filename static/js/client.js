@@ -50,8 +50,10 @@ $("#newGame").click(function(){
         $("#card3").text(game.hand[2]);
 
         updateGameStatusInterval = setInterval(updateGameStatus, 2000);  //each 2sec
+        console.log("New game status: "+"gamenum: "+game.number+" player: "+game.thisPlayer+" stage: "+game.stage+"round: "+game.round);
     })
         .error(function (error) {
+        console.log("Error for new game: "+error);
         alert("error");
     });
 })
@@ -81,18 +83,23 @@ function checkStatusMoveCard(i){
         //check second player has joined
         if (data.current_player == null){
             $("#infoPanel").text("No one has not joined the game yet!");
+            console.log("No one has not joined the game yet!");
         }
         else{
             game.currentPlayer = data.current_player.name;
+            console.log("Current player: "+game.currentPlayer);
             if(game.currentPlayer == game.thisPlayer) {moveCard(i);}
             else{$("#infoPanel").text("It is not your turn to play!");}
         }
-    }).error(function (error) {alert("error"); });
+    }).error(function (error) {
+        alert("error");
+    });
 }
 
 function moveCard(i){
     $.getJSON(host+'/move/'+game.number+'/'+game.thisPlayer+'/'+game.hand[i-1]).done(function (data) {
-        game.stage = data.stage;      
+        game.stage = data.stage;
+        console.log("Card is moved: "+game.hand[i-1]);      
         switch(i){
         case 1:
             $("#card1").hide();
@@ -111,7 +118,10 @@ function moveCard(i){
             break;
         }
         if (game.stage == 'END') {game.currentStatus = "play";}
-        }).error(function (error) {alert("error"); });
+        }).error(function (error) {
+            console.log("Error for move: "+error);
+            alert("error");
+        });
 }
 
 function showWinner(){
@@ -120,18 +130,22 @@ function showWinner(){
         $("#player2PlayedCard").hide();
         $("#gameResult").show();
         if (data.winner == "NO_ONE") {
+            console.log("Game is over. Winner info: "+data.winner);
             $("#gameResult").html("Endded in a tie! " + '&nbsp&nbsp' + " :|");
         }
         else if(data.winner.name == game.thisPlayer){
+            console.log("Game is over. Winner info: "+data.winner.name);
             $("#gameResult").html("You Win! " + '&nbsp&nbsp' +   " :)");
         }
         else{
+            console.log("Game is over. Winner info: "+data.winner.name);
             $("#gameResult").html("You Lost!" +  '&nbsp&nbsp' +   " :(");
         }
 
         clearInterval(updateGameStatusInterval);
     })
         .error(function (error) {
+        console.log("Error for show winner: "+error);
         alert("error");
     });
 }
@@ -146,7 +160,10 @@ function updateGameStatus(){
             theOtherPlayerLastMove = data.p1.pop(); //last move
             $("#player2PlayedCard").text(theOtherPlayerLastMove);
         }
-    }).error(function (error) {alert("error"); });
+    }).error(function (error) {
+        console.log("Error for status update: "+error);
+        alert("error");
+    });
 
     $.getJSON(host+'/game/'+game.number).done(function (data) {
         if (data.current_player != null){
@@ -183,5 +200,8 @@ function updateGameStatus(){
             //the game is Endded
             if (game.stage == 'END') {showWinner();}
         } 
-    }).error(function (error) {alert("error"); });
+    }).error(function (error) {
+        console.log("Error for updating game: "+error);
+        alert("error");
+    });
 }
